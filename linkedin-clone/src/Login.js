@@ -1,21 +1,51 @@
-import React from 'react';
-import './Login.css'
+import React, { useState } from 'react';
+import { auth } from './firebase';
+import './Login.css';
+import { useDispatch } from 'react-redux';
+import { login } from './features/userSlice';
 
 function Login() {
-    const loginToApp = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
+    const [profilePic, setProfilePic] = useState('');
+    const dispatch = useDispatch();
 
+    const loginToApp = (e) => {
+        e.preventDefault();
+        
     };
 
-    const register = () =>{};
+    const register = () =>{
+        if(!name){
+            return alert("Please enter a full name!");
+        }
+
+        auth.createUserWithEmailAndPassword(email, password)
+        .then((userAuth) => {
+            userAuth.user.updateProfile({
+                displayName: name,
+                photoURL: profilePic,
+            })
+            .then(()=>{
+                dispatch(login({
+                    email: userAuth.user.email,
+                    uid: userAuth.user.uid,
+                    displayName: name,
+                    photoURL: profilePic,
+                }))
+            })
+        }).catch(error => alert(error));
+    };
 
     return (
         <div className='login'>
             <img src='http://t1.daumcdn.net/brunch/service/user/2Obj/image/yFVV4vS-laz3c3ShC_YpaEiat8A.png' alt='' />
             <form>
-                <input placeholder='Full name (required if registering)' type='text'/>
-                <input placeholder='Profile pic ULR (optional)' type='text'/>
-                <input placeholder='Email' type='text'/>
-                <input placeholder='Password' type='password'/>
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder='Full name (required if registering)' type='text'/>
+                <input value={profilePic} onChange={(e) => setProfilePic(e.target.value)} placeholder='Profile pic ULR (optional)' type='text'/>
+                <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder='Email' type='text'/>
+                <input value={password} onChange={(e) => setPassword(e.target.value)} placeholder='Password' type='password'/>
                 <button type='submit' onClick={loginToApp}>Sign In</button>
             </form>
             <p>

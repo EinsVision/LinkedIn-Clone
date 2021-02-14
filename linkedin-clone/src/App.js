@@ -9,7 +9,8 @@ import Login from './Login';
 
 
 function App() {
-  const user = useSelector(selectUser)
+  const user = useSelector(selectUser);
+  alert(user);
 
   return (
     <div className="app">
